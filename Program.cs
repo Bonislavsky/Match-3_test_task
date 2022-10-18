@@ -6,7 +6,11 @@ namespace Match3
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!!!");
+            Grid Grid = new Grid();
+            Grid.CreateGrid();
+
+            Console.WriteLine(">>> початкова матриця\n");
+            Grid.ShowGrid();
         }
     }
 }
