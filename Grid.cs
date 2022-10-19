@@ -48,11 +48,11 @@ namespace Match3
         {
             for (int re = 0; re < 2; re++)
             {
-                int fff = 0;
+                int attemptsWithoutSequences = 0;
                 bool ArrayNoSequences = false;
-                while (!ArrayNoSequences && fff < GRID_COLUMN-1)
+                while (!ArrayNoSequences && attemptsWithoutSequences < GRID_COLUMN-1)
                 {
-                    fff = 0;
+                    attemptsWithoutSequences = 0;
                     for (int i = 0; i < GRID_COLUMN; i++)
                     {
                         var tmpArrayColumn = new int[GRID_COLUMN];
@@ -63,9 +63,9 @@ namespace Match3
                             tmpArrayColumn[j] = _grid[j, i];
                             tmpArrayRow[j] = _grid[i, j];
                         }
-                        if (реаре(tmpArrayColumn, MutableVar, i) && реаре(tmpArrayRow, i, MutableVar)) 
+                        if (ReplaceSequence(tmpArrayColumn, MutableVar, i) && ReplaceSequence(tmpArrayRow, i, MutableVar)) 
                         {
-                            fff++;
+                            attemptsWithoutSequences++;
                         }
                         else
                         {
@@ -75,13 +75,11 @@ namespace Match3
 
                         ValueShift();
                     }
-                    //Console.WriteLine();
-                    //ShowGrid();
                 }
             }
         }
 
-        private bool реаре(int[] arr, int coordX, int coordY)
+        private bool ReplaceSequence(int[] arr, int coordX, int coordY)
         {
             bool NoSequences = true;
             for (int i = 0; i < arr.Length-2; i++)
