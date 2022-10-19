@@ -10,16 +10,10 @@ namespace Match3
     {
         private int[,] _grid = new int[GRID_COLUMN, GRID_ROW];
         private Random rnd = new Random();
-        private const int GRID_COLUMN = 3;     // don't forget to change to 9
-        private const int GRID_ROW = 3;        // don't forget to change to 9
-        private bool ArrayNoSequences = false;
+        private const int GRID_COLUMN = 4;     
+        private const int GRID_ROW = 4;        
         private int MutableVar = -1;
 
-
-        // [0,0]  [0,1]  [0,2]  [0,3]  [GRID_COLUMN, GRID_ROW]
-        // [1,0]  [1,1]  [1,2]  [1,3]
-        // [2,0]  [2,1]  [2,2]  [3,3]
-        // [3,0]  [3,1]  [3,2]  [3,3]
 
         public void CreateGrid()
         {
@@ -30,19 +24,19 @@ namespace Match3
                     _grid[i, j] = CreateNumber();
                 }
             }
-            MatchingSearch();
         }
 
         public void ShowGrid()
         {
-            for (int i = 0; i < GRID_ROW+1; i++)
+            Console.Write("   ");
+            for (int i = 0; i < GRID_ROW; i++)
             {
                 Console.Write($"[{i}]");
             }
 
             for (int i = 0; i < GRID_COLUMN; i++)
             {
-                Console.Write($"\n[{i+1}] ");
+                Console.Write($"\n[{i}] ");
                 for (int j = 0; j < GRID_ROW; j++)
                 {
                     Console.Write($"{_grid[i, j]}  ");
@@ -52,22 +46,37 @@ namespace Match3
 
         public void MatchingSearch()
         {
-            while (!ArrayNoSequences)
+            for (int re = 0; re < 2; re++)
             {
-                for (int i = 0; i < GRID_COLUMN; i++)
+                int fff = 0;
+                bool ArrayNoSequences = false;
+                while (!ArrayNoSequences && fff < GRID_COLUMN-1)
                 {
-                    var tmpArrayColumn = new int[GRID_COLUMN];
-                    var tmpArrayRow = new int[GRID_ROW];
-
-                    for (int j = 0; j < GRID_ROW; j++)
+                    fff = 0;
+                    for (int i = 0; i < GRID_COLUMN; i++)
                     {
-                        tmpArrayColumn[j] = _grid[j, i];
-                        tmpArrayRow[j] = _grid[i, j];
-                    }
-                    ArrayNoSequences = реаре(tmpArrayColumn, MutableVar, i);
-                    ArrayNoSequences = реаре(tmpArrayRow, i, MutableVar);
+                        var tmpArrayColumn = new int[GRID_COLUMN];
+                        var tmpArrayRow = new int[GRID_ROW];
 
-                    ValueShift();
+                        for (int j = 0; j < GRID_ROW; j++)
+                        {
+                            tmpArrayColumn[j] = _grid[j, i];
+                            tmpArrayRow[j] = _grid[i, j];
+                        }
+                        if (реаре(tmpArrayColumn, MutableVar, i) && реаре(tmpArrayRow, i, MutableVar)) 
+                        {
+                            fff++;
+                        }
+                        else
+                        {
+                            ValueShift();
+                            break;
+                        }
+
+                        ValueShift();
+                    }
+                    //Console.WriteLine();
+                    //ShowGrid();
                 }
             }
         }
@@ -78,26 +87,34 @@ namespace Match3
             for (int i = 0; i < arr.Length-2; i++)
             {
                 int tmpNum = arr[i];
-                int count = 0;
+
+                if (tmpNum == MutableVar) continue;
+                int count = 1;
                 for (int j = i+1; j < arr.Length; j++)
                 {
-                    if (tmpNum == arr[j]) count++;
-                    else if(tmpNum != arr[j] || j == arr.Length-1)
+                    if(tmpNum == arr[j]) count++;
+                    if (tmpNum != arr[j] || j == arr.Length-1 || tmpNum != arr[j+1])
                     {
                         if(count >= 3)
                         {
                             NoSequences = false;
-                            for (int h = i; h < j; h++)
+                            for (int h = i; h <= j; h++)
                             {
                                 if(coordX == -1)
                                 {
+                                    arr[h] = -1;
                                     _grid[h, coordY] = MutableVar;
                                 }
                                 else if(coordY == -1)
                                 {
+                                    arr[h] = -1;
                                     _grid[coordX, h] = MutableVar;
                                 }
                             }
+                        }
+                        else if(count < 3)
+                        {
+                            break;
                         }
                     }
                 }
@@ -112,7 +129,7 @@ namespace Match3
 
         private void ValueShift()
         {
-            for (int i = 0; i < GRID_COLUMN-1; i++)
+            for (int i = 0; i < GRID_COLUMN; i++)
             {
                 for (int j = 0; j < GRID_ROW; j++)
                 {
@@ -123,7 +140,7 @@ namespace Match3
 
                     else if (_grid[i, j] == -1 )
                     {
-
+                        _grid[i, j] = CreateNumber();
                     }
                 }
             }

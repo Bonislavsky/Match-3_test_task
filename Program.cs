@@ -11,6 +11,11 @@ namespace Match3
 
             Console.WriteLine(">>> початкова матриця\n");
             Grid.ShowGrid();
+
+            Grid.MatchingSearch();
+
+            Console.WriteLine("\n>>> кiнцева матриця\n");
+            Grid.ShowGrid();
         }
     }
 }
