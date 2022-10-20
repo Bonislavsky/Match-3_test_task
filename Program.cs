@@ -14,7 +14,7 @@ namespace Match3
 
             Grid.MatchingSearch();
 
-            Console.WriteLine("\n>>> кiнцева матриця\n");
+            Console.WriteLine("\n>>> кiнцева матриця");
             Grid.ShowGrid();
         }
     }
