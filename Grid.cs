@@ -8,17 +8,16 @@ namespace Match3
 {
     public class Grid
     {
-        private int[,] _grid = new int[GRID_COLUMN, GRID_ROW];
+        private int[,] _grid = new int[WIDTH_HEIGHT_MATRIX, WIDTH_HEIGHT_MATRIX];
         private Random rnd = new Random();
-        private const int GRID_COLUMN = 9;     
-        private const int GRID_ROW = 9;        
+        private const int WIDTH_HEIGHT_MATRIX = 9;     
         private int MutableVar = -1;
 
         public void CreateGrid()
         {
-            for (int i = 0; i < GRID_COLUMN; i++)
+            for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
             {
-                for (int j = 0; j < GRID_ROW; j++)
+                for (int j = 0; j < WIDTH_HEIGHT_MATRIX; j++)
                 {
                     _grid[i, j] = GetRndNumber();
                 }
@@ -28,15 +27,15 @@ namespace Match3
         public void ShowGrid()
         {
             Console.Write("   ");
-            for (int i = 0; i < GRID_ROW; i++)
+            for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
             {
                 Console.Write($"[{i}]");
             }
 
-            for (int i = 0; i < GRID_COLUMN; i++)
+            for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
             {
                 Console.Write($"\n[{i}] ");
-                for (int j = 0; j < GRID_ROW; j++)
+                for (int j = 0; j < WIDTH_HEIGHT_MATRIX; j++)
                 {
                     Console.Write($"{_grid[i, j]}  ");
                 }
@@ -49,27 +48,18 @@ namespace Match3
             {
                 int attemptsWithoutSequences = 0;
                 bool ArrayNoSequences = false;
-                while (!ArrayNoSequences && attemptsWithoutSequences < GRID_COLUMN-1)
+                while (!ArrayNoSequences && attemptsWithoutSequences < WIDTH_HEIGHT_MATRIX - 1)
                 {
                     attemptsWithoutSequences = 0;
-                    for (int i = 0; i < GRID_COLUMN; i++)
+                    for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
                     {
-                        var tmpArrayColumn = new int[GRID_COLUMN];
-                        var tmpArrayRow = new int[GRID_ROW];
-
-                        for (int j = 0; j < GRID_ROW; j++)
-                        {
-                            tmpArrayColumn[j] = _grid[j, i];
-                            tmpArrayRow[j] = _grid[i, j];
-                        }
-
-                        if (ReplaceSequence(tmpArrayColumn, MutableVar, i) && ReplaceSequence(tmpArrayRow, i, MutableVar)) 
+                        if (ReplaceSequence(MutableVar, i) && ReplaceSequence(i, MutableVar)) 
                         {
                             attemptsWithoutSequences++;
                         }
                         else
                         {
-                            ValueShift(tmpArrayColumn, i);
+                            ValueShift(i);
                             ChangeValue();
                             break;
                         }
@@ -78,45 +68,74 @@ namespace Match3
             }
         }
 
-        private bool ReplaceSequence(int[] arr, int coordX, int coordY)
+        private bool ReplaceSequence(int coordX, int coordY)
         {
             bool NoSequences = true;
-            for (int i = 0; i < arr.Length-2; i++)
+            if (coordX == MutableVar)
             {
-                int tmpNum = arr[i];
-
-                if (tmpNum == MutableVar) continue;
-                int count = 1;
-                for (int j = i+1; j < arr.Length; j++)
+                for (int i = 0; i < WIDTH_HEIGHT_MATRIX - 2; i++)
                 {
-                    if(tmpNum == arr[j]) count++;
-                    if (tmpNum != arr[j] || j == arr.Length-1 || tmpNum != arr[j+1])
-                    {
-                        if(count >= 3)
-                        {
-                            NoSequences = false;
+                    int tmpNumI = _grid[i, coordY];
 
-                            for (int h = i; h <= j; h++)
+                    if (tmpNumI == MutableVar) continue;
+
+                    int count = 1;
+                    for (int j = i + 1; j < WIDTH_HEIGHT_MATRIX; j++)
+                    {
+                        if (tmpNumI == _grid[j, coordY]) count++;
+
+                        if (tmpNumI != _grid[j, coordY] || j == _grid.GetLength(0) - 1 || tmpNumI != _grid[j+1, coordY])
+                        {
+                            if (count >= 3)
                             {
-                                if (coordX == -1)
+                                NoSequences = false;
+
+                                for (int h = i; h <= j; h++)
                                 {
-                                    arr[h] = -1;
-                                    _grid[h, coordY] = MutableVar;
-                                }
-                                else if (coordY == -1)
-                                {
-                                    arr[h] = -1;
-                                    _grid[coordX, h] = MutableVar;
+                                    _grid[h, coordY] = MutableVar;                                    
                                 }
                             }
-                        }
-                        else if(count < 3)
-                        {
-                            break;
+                            else if (count < 3)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
             }
+            else if (coordY == MutableVar)
+            {
+                for (int i = 0; i < WIDTH_HEIGHT_MATRIX - 2; i++)
+                {
+                    int tmpNumI = _grid[coordX, i];
+
+                    if (tmpNumI == MutableVar) continue;
+
+                    int count = 1;
+                    for (int j = i + 1; j < WIDTH_HEIGHT_MATRIX; j++)
+                    {
+                        if (tmpNumI == _grid[coordX, j]) count++;
+
+                        if (tmpNumI != _grid[coordX, j] || j == _grid.GetLength(0) - 1 || tmpNumI != _grid[coordX, j+1])
+                        {
+                            if (count >= 3)
+                            {
+                                NoSequences = false;
+
+                                for (int h = i; h <= j; h++)
+                                {
+                                    _grid[coordX, h] = MutableVar;
+                                }
+                            }
+                            else if (count < 3)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            } 
+
             return NoSequences;
         }
 
@@ -125,23 +144,19 @@ namespace Match3
             return rnd.Next(0, 4);
         }
 
-        private void ValueShift(int[] arr, int coordY)
+        private void ValueShift(int coordY)
         {
-            for (int i = 0; i < arr.Length; i++)
+            for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
             {
-                if (arr[i] == -1)
+                if (_grid[i, coordY] == -1)
                 {
                     for (int j = 0; j < i; j++)
                     {
-                        if (arr[j] != -1)
+                        if (_grid[j, coordY] != -1)
                         {
                             int tmpn = _grid[j, coordY];
                             _grid[j, coordY] = _grid[i, coordY];
                             _grid[i, coordY] = tmpn;
-
-                            int tmp = arr[j];
-                            arr[j] = arr[i];
-                            arr[i] = tmp;
                             break;
                         }
                     }
@@ -151,9 +166,9 @@ namespace Match3
 
         private void ChangeValue()
         {
-            for (int i = 0; i < GRID_COLUMN; i++)
+            for (int i = 0; i < WIDTH_HEIGHT_MATRIX; i++)
             {
-                for (int j = 0; j < GRID_ROW; j++)
+                for (int j = 0; j < WIDTH_HEIGHT_MATRIX; j++)
                 {
                     if (_grid[i, j] == -1)
                     {
