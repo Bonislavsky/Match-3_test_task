@@ -20,7 +20,7 @@ namespace Match3
             {
                 for (int j = 0; j < GRID_ROW; j++)
                 {
-                    _grid[i, j] = GetRndNumber();
+                    _grid[i, j] = 1;
                 }
             }
         }
@@ -54,22 +54,13 @@ namespace Match3
                     attemptsWithoutSequences = 0;
                     for (int i = 0; i < GRID_COLUMN; i++)
                     {
-                        var tmpArrayColumn = new int[GRID_COLUMN];
-                        var tmpArrayRow = new int[GRID_ROW];
-
-                        for (int j = 0; j < GRID_ROW; j++)
-                        {
-                            tmpArrayColumn[j] = _grid[j, i];
-                            tmpArrayRow[j] = _grid[i, j];
-                        }
-
-                        if (ReplaceSequence(tmpArrayColumn, MutableVar, i) && ReplaceSequence(tmpArrayRow, i, MutableVar)) 
+                        if (ReplaceSequence(MutableVar, i) && ReplaceSequence(i, MutableVar)) 
                         {
                             attemptsWithoutSequences++;
                         }
                         else
                         {
-                            ValueShift(tmpArrayColumn, i);
+                            ValueShift(i);
                             ChangeValue();
                             break;
                         }
@@ -78,45 +69,74 @@ namespace Match3
             }
         }
 
-        private bool ReplaceSequence(int[] arr, int coordX, int coordY)
+        private bool ReplaceSequence(int coordX, int coordY)
         {
             bool NoSequences = true;
-            for (int i = 0; i < arr.Length-2; i++)
+            if (coordX == MutableVar)
             {
-                int tmpNum = arr[i];
-
-                if (tmpNum == MutableVar) continue;
-                int count = 1;
-                for (int j = i+1; j < arr.Length; j++)
+                for (int i = 0; i < _grid.GetLength(0) - 2; i++)
                 {
-                    if(tmpNum == arr[j]) count++;
-                    if (tmpNum != arr[j] || j == arr.Length-1 || tmpNum != arr[j+1])
-                    {
-                        if(count >= 3)
-                        {
-                            NoSequences = false;
+                    int tmpNumI = _grid[i, coordY];
 
-                            for (int h = i; h <= j; h++)
+                    if (tmpNumI == MutableVar) continue;
+
+                    int count = 1;
+                    for (int j = i + 1; j < _grid.GetLength(1); j++)
+                    {
+                        if (tmpNumI == _grid[j, coordY]) count++;
+
+                        if (tmpNumI != _grid[j, coordY] || j == _grid.GetLength(0) - 1 || tmpNumI != _grid[j+1, coordY])
+                        {
+                            if (count >= 3)
                             {
-                                if (coordX == -1)
+                                NoSequences = false;
+
+                                for (int h = i; h <= j; h++)
                                 {
-                                    arr[h] = -1;
-                                    _grid[h, coordY] = MutableVar;
-                                }
-                                else if (coordY == -1)
-                                {
-                                    arr[h] = -1;
-                                    _grid[coordX, h] = MutableVar;
+                                    _grid[h, coordY] = MutableVar;                                    
                                 }
                             }
-                        }
-                        else if(count < 3)
-                        {
-                            break;
+                            else if (count < 3)
+                            {
+                                break;
+                            }
                         }
                     }
                 }
             }
+            else if (coordY == MutableVar)
+            {
+                for (int i = 0; i < _grid.GetLength(0) - 2; i++)
+                {
+                    int tmpNumI = _grid[coordX, i];
+
+                    if (tmpNumI == MutableVar) continue;
+
+                    int count = 1;
+                    for (int j = i + 1; j < _grid.GetLength(1); j++)
+                    {
+                        if (tmpNumI == _grid[coordX, j]) count++;
+
+                        if (tmpNumI != _grid[coordX, j] || j == _grid.GetLength(0) - 1 || tmpNumI != _grid[coordX, j+1])
+                        {
+                            if (count >= 3)
+                            {
+                                NoSequences = false;
+
+                                for (int h = i; h <= j; h++)
+                                {
+                                    _grid[coordX, h] = MutableVar;
+                                }
+                            }
+                            else if (count < 3)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            } 
+
             return NoSequences;
         }
 
@@ -125,23 +145,19 @@ namespace Match3
             return rnd.Next(0, 4);
         }
 
-        private void ValueShift(int[] arr, int coordY)
+        private void ValueShift(int coordY)
         {
-            for (int i = 0; i < arr.Length; i++)
+            for (int i = 0; i < _grid.GetLength(0); i++)
             {
-                if (arr[i] == -1)
+                if (_grid[i, coordY] == -1)
                 {
                     for (int j = 0; j < i; j++)
                     {
-                        if (arr[j] != -1)
+                        if (_grid[j, coordY] != -1)
                         {
                             int tmpn = _grid[j, coordY];
                             _grid[j, coordY] = _grid[i, coordY];
                             _grid[i, coordY] = tmpn;
-
-                            int tmp = arr[j];
-                            arr[j] = arr[i];
-                            arr[i] = tmp;
                             break;
                         }
                     }
